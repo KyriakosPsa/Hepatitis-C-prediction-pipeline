@@ -23,11 +23,12 @@ class ClassifierCV():
     outer folds are used to evaluate the model performance in fit_evaluate. This allows for a robust evalution of the
     selected classifier that is not biased by a single train/test split"""
 
-    def __init__(self, classifier_name, tuning_beta=1, model=None, seed=42, outer_folds=5, tuning_folds=3, optimization_trials=50, trial_num=10, shuffle=True, verbose=True):
+    def __init__(self, classifier_name, class_weight={1: 1, 0: 1}, tuning_beta=1, model=None, seed=42, outer_folds=5, tuning_folds=3, optimization_trials=50, trial_num=10, shuffle=True, verbose=True):
         """
         classifier_name: Name of the classifier to be used for hyperparameter tuning (e.g. "KNeighborsClassifier")
         tuning_beta: fbeta score in the tuning cv loop, choose beta < 1 to prioritize precision, beta > 1 to prioritize recall (Less FN) (default=1 == f1 score)
         model: This is set to None, it will be used to store the best model after hyperparameter tuning
+        class_weights: dictionary in the form {class_label_1: weight_1,class_label_2,weight_2} to adjust the importance of classes in the training process default(equal importance {1: 1, 0: 1})
         seed: Random seed for generating the seed array from which a seed is picked for each trial (default=42) 
         outer_folds: Number of outer cross validation folds (default=5)
         tuning_folds: Number of tuning cross validation folds, used in `fit_evaluate` as nested cv or in fit as simple cv (default=3) 
@@ -36,6 +37,7 @@ class ClassifierCV():
         trial_num: Number of trials to be performed for hyperparameter tuning (default=10)
         verbose: Boolean, if Ture print the results of the fit method after the trials finish (default=True)
         """
+        self.class_weight = class_weight
         self.shuffle = shuffle
         self.outer_folds = outer_folds
         self.tuning_folds = tuning_folds
@@ -48,6 +50,7 @@ class ClassifierCV():
         self.verbose = verbose
         # Set the random seed for generating the seed for each trial
         self.seed = seed
+        np.random.seed(seed)
 
     def __repr__(self):
         """Class Object string representation"""
@@ -55,7 +58,7 @@ class ClassifierCV():
 
     def get_params(self, deep=False):
         """method to get the parameters of an estimator, required for implementation in sklearn pipelines"""
-        param_dict = {"classifier_name": self.classifier_name, "tuning_beta": self.tuning_beta,
+        param_dict = {"classifier_name": self.classifier_name, "class_weight": self.class_weight, "tuning_beta": self.tuning_beta,
                       "model": self.model, "seed": self.seed, "outer_folds": self.outer_folds,
                       "tuning_folds": self.tuning_folds, "optimization_trials": self.optimization_trials,
                       "trial_num": self.trial_num, "shuffle": self.shuffle, "verbose": self.verbose}
@@ -70,7 +73,6 @@ class ClassifierCV():
 
     # Fit the selected classifier in 10 cross validation trials for hyperparameter tuning
     def fit_transform(self, X, y):
-        np.random.seed(seed)
         self.trials_seeds = np.random.randint(0, 1000, size=self.trial_num)
         """Nested cross validation with hyperparameter optimization in the inner cv loop to provide a robust evaluation of the model performance.
         Do not use this method to fit the final model, it is meant to be used for classifier category evaluation only"""
@@ -197,7 +199,7 @@ class ClassifierCV():
             penalty = "l1"
             solver = trial.suggest_categorical("solver", ['liblinear', 'saga'])
             self.model = LogisticRegression(
-                C=C, penalty=penalty, solver=solver)
+                C=C, penalty=penalty, solver=solver, class_weight=self.class_weight)
         # Elastic Logistic regression tuning
         elif self.classifier_name == "LogisticRegression-elastic":
             solver = 'saga'
@@ -205,7 +207,7 @@ class ClassifierCV():
             C = trial.suggest_float("C", 0.001, 100.0, log=True)
             l1_ratio = trial.suggest_float("l1_ratio", 0.0, 0.1)
             self.model = LogisticRegression(
-                C=C, solver=solver, penalty=penalty, l1_ratio=l1_ratio)
+                C=C, solver=solver, penalty=penalty, l1_ratio=l1_ratio, class_weight=self.class_weight)
         # Ridge Logistic regression tuning
         elif self.classifier_name == "LogisticRegression-ridge":
             solver = trial.suggest_categorical(
@@ -213,31 +215,35 @@ class ClassifierCV():
             penalty = "l2"
             C = trial.suggest_float("C", 0.001, 100.0, log=True)
             self.model = LogisticRegression(
-                C=C, penalty=penalty, solver=solver)
+                C=C, penalty=penalty, solver=solver, class_weight=self.class_weight)
         # linear kernel SVM tuning
         elif self.classifier_name == "SVC-linear":
             kernel = 'linear'
             C = trial.suggest_float("C", 0.001, 100.0, log=True)
-            self.model = SVC(C=C, kernel=kernel)
+            self.model = SVC(C=C, kernel=kernel,
+                             class_weight=self.class_weight)
         # Polynomial kernel SVM tuning
         elif self.classifier_name == "SVC-poly":
             kernel = "poly"
             degree = trial.suggest_int('degree', 3, 5)
             C = trial.suggest_float("C", 0.001, 100.0, log=True)
             gamma = trial.suggest_float("gamma", 0.001, 100.0, log=True)
-            self.model = SVC(C=C, kernel=kernel, gamma=gamma, degree=degree)
+            self.model = SVC(C=C, kernel=kernel, gamma=gamma,
+                             degree=degree, class_weight=self.class_weight)
         # Radial basis function kernel SVM tuning
         elif self.classifier_name == "SVC-rbf":
             kernel = "rbf"
             C = trial.suggest_float("C", 0.001, 100.0, log=True)
             gamma = trial.suggest_float("gamma", 0.001, 100.0, log=True)
-            self.model = SVC(C=C, kernel=kernel, gamma=gamma)
+            self.model = SVC(C=C, kernel=kernel, gamma=gamma,
+                             class_weight=self.class_weight)
         # sigmoid kernel SVM tuning
         elif self.classifier_name == "SVC-sigmoid":
             kernel = "sigmoid"
             C = trial.suggest_float("C", 0.001, 100.0, log=True)
             gamma = trial.suggest_float("gamma", 0.001, 100.0, log=True)
-            self.model = SVC(C=C, kernel=kernel, gamma=gamma)
+            self.model = SVC(C=C, kernel=kernel, gamma=gamma,
+                             class_weight=self.class_weight)
         else:
             raise ValueError(
                 f"{self.classifier_name} is not a valid classifier name or its not yet implemented")
