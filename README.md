@@ -1,4 +1,4 @@
-# Projcet Description
+# Project Description
 This project presents a machine-learning pipeline developed for hepatitis C virus (HCV) prediction. The aim is to assess the
 performance of different classification algorithms in the task at hand and reliably select and optimize the hyperparameters of
 the best-performing one. The baseline pipeline designed for HCV prediction consists of three main stages: data preprocessing,
@@ -30,19 +30,14 @@ ples, comprising data on hepatitis C patients and
 healthy blood donors. Each sample corresponds to
 a patient’s ID, and 12 features are available for each
 donor. To visualize the data-set, a t-SNE projection
-based on the minimization of the Kullback-Leibler di-
-vergence between the estimated t-distribution kernel
+based on the minimization of the Kullback-Leibler divergence between the estimated t-distribution kernel
 density joint probability function of the data points
-in the original high-dimensional space and a lower-
-dimensional space was utilized.The first two features of the dataset capture the age and
-sex of the donor, while the remaining features rep-
-resent the levels of various molecules obtained from
-blood chemistry results, specifically from liver func-
-tion tests as presented in (table 1). Concerning the
+in the original high-dimensional space and a lower dimensional space was utilized.The first two features of the dataset capture the age and
+sex of the donor, while the remaining features represent the levels of various molecules obtained from
+blood chemistry results, specifically from liver function tests as presented in (table 1). Concerning the
 target labels, the blood donors are binary classified
 into healthy (label=0), or HCV positive (label=1). It’s
-important to note that as with most medical data-
-sets, the samples for the labels are imbalanced with
+important to note that as with most medical datasets, the samples for the labels are imbalanced with
 the HCV-positive class being the minority class and
 accounting for 50% of the number of samples of the
 majority HCV-negative class.
