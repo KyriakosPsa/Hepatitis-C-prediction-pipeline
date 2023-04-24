@@ -221,7 +221,7 @@ class ClassifierCV():
             kernel = 'linear'
             C = trial.suggest_float("C", 0.001, 100.0, log=True)
             self.model = SVC(C=C, kernel=kernel,
-                             class_weight=self.class_weight)
+                             class_weight=self.class_weight, probability=True)
         # Polynomial kernel SVM tuning
         elif self.classifier_name == "SVC-poly":
             kernel = "poly"
@@ -229,21 +229,21 @@ class ClassifierCV():
             C = trial.suggest_float("C", 0.001, 100.0, log=True)
             gamma = trial.suggest_float("gamma", 0.001, 100.0, log=True)
             self.model = SVC(C=C, kernel=kernel, gamma=gamma,
-                             degree=degree, class_weight=self.class_weight)
+                             degree=degree, class_weight=self.class_weight, probability=True)
         # Radial basis function kernel SVM tuning
         elif self.classifier_name == "SVC-rbf":
             kernel = "rbf"
             C = trial.suggest_float("C", 0.001, 100.0, log=True)
             gamma = trial.suggest_float("gamma", 0.001, 100.0, log=True)
             self.model = SVC(C=C, kernel=kernel, gamma=gamma,
-                             class_weight=self.class_weight)
+                             class_weight=self.class_weight, probability=True,)
         # sigmoid kernel SVM tuning
         elif self.classifier_name == "SVC-sigmoid":
             kernel = "sigmoid"
             C = trial.suggest_float("C", 0.001, 100.0, log=True)
             gamma = trial.suggest_float("gamma", 0.001, 100.0, log=True)
             self.model = SVC(C=C, kernel=kernel, gamma=gamma,
-                             class_weight=self.class_weight)
+                             class_weight=self.class_weight, probability=True)
         else:
             raise ValueError(
                 f"{self.classifier_name} is not a valid classifier name or its not yet implemented")
