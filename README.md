@@ -103,4 +103,4 @@ cost-sensitive learning method we used is only one of
 several methods to deal with them. **We recommend
 utilizing additional methods, such as oversampling
 with SMOTE, to extend the base pipeline presented
-in this report.**
+in this project.**
