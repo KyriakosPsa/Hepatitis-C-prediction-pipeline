@@ -137,7 +137,7 @@ class ClassifierCV():
             print(mean_var_df.mean(axis=0))
         return total_cv_scores_df, parameters
 
-    def fit(self, X, y, seed):
+    def fit(self, X, y):
         """Simple Cross validation with hyperparameter optimization to provide a final optimized model,
         after the best category of classifier is selected via fit_evaluate. Use this method to 
         fit the final model in the whole dataset."""
@@ -145,7 +145,7 @@ class ClassifierCV():
             n_splits=self.tuning_folds, shuffle=self.shuffle, random_state=self.seed)
         self.X_train = X
         self.y_train = y
-        sampler = optuna.samplers.TPESampler(seed=seed)
+        sampler = optuna.samplers.TPESampler(seed=self.seed)
         study = optuna.create_study(direction="maximize", sampler=sampler)
         study.optimize(self.objective, n_trials=self.optimization_trials)
         params = study.best_params
