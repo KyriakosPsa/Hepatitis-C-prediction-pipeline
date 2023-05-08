@@ -100,7 +100,10 @@ class ClassifierCV():
                 ############## START tuning cross validation loop to tune hyperparameters via the optuna objective method START ##################
                 # Gaussian Naive Bayes does not have any hyperparameters to tune, skip the tuning cross validation loop
                 if self.classifier_name != "GaussianNB":
-                    study = optuna.create_study(direction="maximize")
+                    # Make the sampler behave in a deterministic way.
+                    sampler = optuna.samplers.TPESampler(seed=seed)
+                    study = optuna.create_study(
+                        direction="maximize", sampler=sampler)
                     study.optimize(
                         self.objective, n_trials=self.optimization_trials)
                     params = study.best_params
@@ -134,7 +137,7 @@ class ClassifierCV():
             print(mean_var_df.mean(axis=0))
         return total_cv_scores_df, parameters
 
-    def fit(self, X, y):
+    def fit(self, X, y, seed):
         """Simple Cross validation with hyperparameter optimization to provide a final optimized model,
         after the best category of classifier is selected via fit_evaluate. Use this method to 
         fit the final model in the whole dataset."""
@@ -142,7 +145,8 @@ class ClassifierCV():
             n_splits=self.tuning_folds, shuffle=self.shuffle, random_state=self.seed)
         self.X_train = X
         self.y_train = y
-        study = optuna.create_study(direction="maximize")
+        sampler = optuna.samplers.TPESampler(seed=seed)
+        study = optuna.create_study(direction="maximize", sampler=sampler)
         study.optimize(self.objective, n_trials=self.optimization_trials)
         params = study.best_params
         self.model.set_params(**params)
