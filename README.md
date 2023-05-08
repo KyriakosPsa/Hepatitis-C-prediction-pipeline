@@ -20,13 +20,13 @@ import pickle
 with open('finalized_model.pickle' , 'rb') as file:
     model = pickle.load(file)   
 ```
-From there on you can utilize it like any other sci-kit model, to make predictions and evaluate its perforance
+From there on you can utilize it like any other sci-kit model, to make predictions and evaluate its performance
 
 # Dataset-Description
 
 ![img](images/initial_tsne.png)
-The dataset utilized consisting of 204 sam-
-ples, comprising data on hepatitis C patients and
+The dataset utilized consists of 204 sam-
+ples, comprising of data on hepatitis C patients and
 healthy blood donors. Each sample corresponds to
 a patient’s ID, and 12 features are available for each
 donor. To visualize the data-set, a t-SNE projection
