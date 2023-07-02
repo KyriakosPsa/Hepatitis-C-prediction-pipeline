@@ -10,7 +10,7 @@ discriminant analysis (LDA), Gaussian naive Bayes (GNB) and lasso,ridge, elastic
 indicate that SVMs with a liner kernel performed best on the 12-D feature space with Mathews Corelation Coefficient (MCC) 
 score of $0.829$ after 50 nested cross validation trials.
 
-The full technical report is attached `Techinal_Report.pdf` and is recommended over this summary.
+**The full technical report is attached `Techinal_Report.pdf` and is recommended over this summary.**
 
 # Loading and using the best model 
 The best model selected by the developed pipeline is saved using the pickle library as `finalized_model.pickle` to load it you can execute the following code in a python file:
